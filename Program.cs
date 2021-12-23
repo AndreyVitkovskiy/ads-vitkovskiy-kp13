@@ -1,180 +1,59 @@
 ﻿using System;
 
-namespace task
+namespace Lab3
 {
     class Program
     {
-        static int max_matrix(int[,] matrix, int n)
+        static int IndexOfMin(int[] array, int n)
         {
-            int max = 0;
-
-            for (int i = 0; i < n; i++)
+            int result = n;
+            for (var i = n; i < array.Length; ++i)
             {
-                for (int j = 0; j < n; j++)
+                if (array[i] < array[result])
                 {
-                    if (matrix[i, j] > max)
-                    {
-                        max = matrix[i, j];
-                    }
+                    result = i;
                 }
             }
-            return max;
+
+            return result;
+        }
+
+        static void Swap(ref int x, ref int y)
+        {
+            var t = x;
+            x = y;
+            y = t;
+        }
+
+        static int[] SelectionSort(int[] array, int currentIndex = 0)
+        {
+            if (currentIndex == array.Length)
+                return array;
+
+            var index = IndexOfMin(array, currentIndex);
+            if (index != currentIndex)
+            {
+                Swap(ref array[index], ref array[currentIndex]);
+            }
+
+            return SelectionSort(array, currentIndex + 1);
         }
 
         static void Main(string[] args)
         {
-            int n = 0;
-
-            bool check = false;
-
-            while (check == false)
+            Console.WriteLine("Сортування вибором");
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.Write("Введіть елементи масиву: ");
+            var s = Console.ReadLine().Split(new[] { " ", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+            Console.BackgroundColor = ConsoleColor.Green;
+            var a = new int[s.Length];
+            for (int i = 0; i < s.Length; i++)
             {
-                Console.Write("Введите n: ");
-
-                string l = Console.ReadLine();
-
-                if (int.TryParse(l, out n))
-                {
-                    check = true;
-                }
+                a[i] = Convert.ToInt32(s[i]);
             }
 
-            int[,] matrix = new int[n, n];
-            
-            Random rnd = new Random();
-
-            int k = rnd.Next(0, 100);
-
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
-                    matrix[i, j] = rnd.Next(0, 100);
-                }
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
-                    Console.Write($"\t{matrix[i, j]}");
-                }
-                Console.WriteLine();
-            }
-
-            Console.WriteLine($"k = {k}");
-
-            Console.WriteLine("Часть выше главной диагонали:");
-            int up_min = max_matrix(matrix, n) + 1;
-            string up_result = "В верхней части нет искомого элемента!";
-
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = n - 1; j >= i + 1; j--)
-                {
-                    if (matrix[i, j] % k == 0)
-                    {
-                        if (up_min > matrix[i, j])
-                        {
-                            up_min = matrix[i, j];
-                            up_result = $"Искомый элемент верхней части равен [{i}, {j}] и равен {up_min}";
-                        }
-                    }
-                    Console.Write($"{matrix[i, j]} ");
-                }
-
-                i += 1;
-
-                for (int j = i + 1; j <= n - 1; j++)
-                {
-                    if (matrix[i, j] % k == 0)
-                    {
-                        if (up_min > matrix[i, j])
-                        {
-                            up_min = matrix[i, j];
-                            up_result = $"Искомый элемент верхней части равен [{i}, {j}] и равен {up_min}";
-                        }
-                    }
-                    Console.Write($"{matrix[i, j]} ");
-                }
-            }
-            Console.WriteLine();
-            Console.WriteLine(up_result);
-
-            Console.WriteLine("Главная диагональ:");
-            int diagonal_max = -1;
-            int diagonal_min = max_matrix(matrix, n) + 1;
-            string diagonal_max_result = "";
-            string diagonal_min_result = "";
-
-            for (int i = n - 1; i >= 0; i--)
-            {
-                Console.Write($"{matrix[i, i]} ");
-                if (diagonal_max < matrix[i, i])
-                {
-                    diagonal_max = matrix[i, i];
-                    diagonal_max_result = $"Максимальный искомый элемент на главной диагонали равен [{i}, {i}] и равен {diagonal_max}";
-                }
-                if (diagonal_min > matrix[i, i])
-                {
-                    diagonal_min = matrix[i, i];
-                    diagonal_min_result = $"Минимальный искомый элемент на главной диагонали равен [{i}, {i}] и равен {diagonal_min}";
-                }
-            }
-            Console.WriteLine();
-            Console.WriteLine(diagonal_max_result);
-            Console.WriteLine(diagonal_min_result);
-
-            Console.WriteLine("Часть ниже главной диагонали:");
-            int down_min = max_matrix(matrix, n) + 1;
-            int down_max = -1;
-            string down_max_result = "В нижней части нет искомого элемента!";
-
-            double h = (diagonal_max - diagonal_min) / 2;
-            Console.WriteLine($"Полу разница = {h}");
-
-            if (h != 0)
-            {
-                for (int j = 0; j <= n - 1; j++)
-                {
-                    for (int i = j + 1; i <= n - 1; i++)
-                    {
-                        Console.Write($"{matrix[i, j]} ");
-                        if (matrix[i, j] % h == 0)
-                        {
-                            if (down_max < matrix[i, j])
-                            {
-                                down_max = matrix[i, j];
-                                down_max_result = $"Максимальный искомый элемент нижней части равен [{i}, {j}] и равен {down_max}";
-
-                            }
-                        }
-                    }
-
-                    j += 1;
-
-                    for (int i = n - 1; i >= j + 1; i--)
-                    {
-                        Console.Write($"{matrix[i, j]} ");
-                        if (matrix[i, j] % h == 0)
-                        {
-                            if (down_max < matrix[i, j])
-                            {
-                                down_max = matrix[i, j];
-                                down_max_result = $"Максимальный искомый элемент нижней части равен [{i}, {j}] и равен {down_max}";
-
-                            }
-                        }
-                    }
-                }
-                Console.WriteLine();
-                Console.WriteLine(down_max_result);
-            }
-            else
-            {
-                Console.WriteLine();
-                Console.WriteLine("Ошибка! Нет кратных нулю");
-            }
+            Console.WriteLine("Впорядкований масив: {0}", string.Join(", ", SelectionSort(a)));
+            Console.ReadLine();
         }
     }
 }
