@@ -1,59 +1,110 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
-namespace Lab3
+namespace Lab4
 {
-    class Program
+    class SlList
     {
-        static int IndexOfMin(int[] array, int n)
+        public class Node<T>
         {
-            int result = n;
-            for (var i = n; i < array.Length; ++i)
+            public Node(T data)
             {
-                if (array[i] < array[result])
+                Data = data;
+            }
+            public T Data { get; set; }
+            public Node<T> Next { get; set; }
+        }
+        public class LinkedList<T> : IEnumerable<T>
+        {
+            Node<T> head;
+            Node<T> tail; 
+            int count;
+            public void Add(T data)
+            {
+                Node<T> node = new Node<T>(data);
+
+                if (head == null)
+                    head = node;
+                else
+                    tail.Next = node;
+                tail = node;
+
+                count++;
+            }
+            public bool Delete(T data)
+            {
+                Node<T> current = head;
+                Node<T> previous = null;
+
+                while (current != null)
                 {
-                    result = i;
+                    if (current.Data.Equals(data))
+                    {
+                        if (previous != null)
+                        {
+                            previous.Next = current.Next;
+                            if (current.Next == null)
+                                tail = previous;
+                        }
+                        else
+                        {
+                            head = head.Next;
+                            if (head == null)
+                                tail = null;
+                        }
+                        count--;
+                        return true;
+                    }
+
+                    previous = current;
+                    current = current.Next;
+                }
+                return false;
+            }
+
+            public int Count { get { return count; } }
+            public bool IsEmpty { get { return count == 0; } }
+            // очистка списка
+            public void Clear()
+            {
+                head = null;
+                tail = null;
+                count = 0;
+            }
+            public bool Contains(T data)
+            {
+                Node<T> current = head;
+                while (current != null)
+                {
+                    if (current.Data.Equals(data))
+                        return true;
+                    current = current.Next;
+                }
+                return false;
+            }
+            public void AppendFirst(T data)
+            {
+                Node<T> node = new Node<T>(data);
+                node.Next = head;
+                head = node;
+                if (count == 0)
+                    tail = head;
+                count++;
+            }
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return ((IEnumerable)this).GetEnumerator();
+            }
+            IEnumerator<T> IEnumerable<T>.GetEnumerator()
+            {
+                Node<T> current = head;
+                while (current != null)
+                {
+                    yield return current.Data;
+                    current = current.Next;
                 }
             }
-
-            return result;
-        }
-
-        static void Swap(ref int x, ref int y)
-        {
-            var t = x;
-            x = y;
-            y = t;
-        }
-
-        static int[] SelectionSort(int[] array, int currentIndex = 0)
-        {
-            if (currentIndex == array.Length)
-                return array;
-
-            var index = IndexOfMin(array, currentIndex);
-            if (index != currentIndex)
-            {
-                Swap(ref array[index], ref array[currentIndex]);
-            }
-
-            return SelectionSort(array, currentIndex + 1);
-        }
-
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Сортування вибором");
-            Console.BackgroundColor = ConsoleColor.Red;
-            Console.Write("Введіть елементи масиву: ");
-            var s = Console.ReadLine().Split(new[] { " ", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
-            Console.BackgroundColor = ConsoleColor.Green;
-            var a = new int[s.Length];
-            for (int i = 0; i < s.Length; i++)
-            {
-                a[i] = Convert.ToInt32(s[i]);
-            }
-
-            Console.WriteLine("Впорядкований масив: {0}", string.Join(", ", SelectionSort(a)));
-            Console.ReadLine();
         }
     }
 }
