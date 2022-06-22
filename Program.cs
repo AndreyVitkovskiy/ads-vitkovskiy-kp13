@@ -1,144 +1,59 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 
-namespace Lab6
+namespace Lab7
 {
-    public class DoublyNode<T>
+    class Program
     {
-        public DoublyNode(T data)
+        static void Main(string[] args)
         {
-            Data = data;
-        }
-        public T Data { get; set; }
-        public DoublyNode<T> Previous { get; set; }
-        public DoublyNode<T> Next { get; set; }
-    }
+            string sSourceData;
+            byte[] tmpSource;
+            byte[] tmpHash;
+            sSourceData = "MySourceData";
+            tmpSource = ASCIIEncoding.ASCII.GetBytes(sSourceData);
 
-    public class Deque<T> : IEnumerable<T>  
-    {
-        DoublyNode<T> head; 
-        DoublyNode<T> tail; 
-        int count;  
+            tmpHash = new MD5CryptoServiceProvider().ComputeHash(tmpSource);
+            Console.WriteLine(ByteArrayToString(tmpHash));
 
-        public void AddLast(T data)
-        {
-            DoublyNode<T> node = new DoublyNode<T>(data);
+            sSourceData = "NotMySourceData";
+            tmpSource = ASCIIEncoding.ASCII.GetBytes(sSourceData);
 
-            if (head == null)
-                head = node;
+            byte[] tmpNewHash;
+
+            tmpNewHash = new MD5CryptoServiceProvider().ComputeHash(tmpSource);
+
+            bool bEqual = false;
+            if (tmpNewHash.Length == tmpHash.Length)
+            {
+                int i = 0;
+                while ((i < tmpNewHash.Length) && (tmpNewHash[i] == tmpHash[i]))
+                {
+                    i += 1;
+                }
+                if (i == tmpNewHash.Length)
+                {
+                    bEqual = true;
+                }
+            }
+
+            if (bEqual)
+                Console.WriteLine("The two hash values are the same");
             else
-            {
-                tail.Next = node;
-                node.Previous = tail;
-            }
-            tail = node;
-            count++;
-        }
-        public void AddFirst(T data)
-        {
-            DoublyNode<T> node = new DoublyNode<T>(data);
-            DoublyNode<T> temp = head;
-            node.Next = temp;
-            head = node;
-            if (count == 0)
-                tail = head;
-            else
-                temp.Previous = node;
-            count++;
-        }
-        public T RemoveFirst()
-        {
-            if (count == 0)
-                throw new InvalidOperationException();
-            T output = head.Data;
-            if (count == 1)
-            {
-                head = tail = null;
-            }
-            else
-            {
-                head = head.Next;
-                head.Previous = null;
-            }
-            count--;
-            return output;
-        }
-        public T RemoveLast()
-        {
-            if (count == 0)
-                throw new InvalidOperationException();
-            T output = tail.Data;
-            if (count == 1)
-            {
-                head = tail = null;
-            }
-            else
-            {
-                tail = tail.Previous;
-                tail.Next = null;
-            }
-            count--;
-            return output;
-        }
-        public T First
-        {
-            get
-            {
-                if (IsEmpty)
-                    throw new InvalidOperationException();
-                return head.Data;
-            }
-        }
-        public T Last
-        {
-            get
-            {
-                if (IsEmpty)
-                    throw new InvalidOperationException();
-                return tail.Data;
-            }
+                Console.WriteLine("The two hash values are not the same");
+            Console.ReadLine();
         }
 
-        public int Count { get { return count; } }
-        public bool IsEmpty { get { return count == 0; } }
-
-        public void Clear()
+        static string ByteArrayToString(byte[] arrInput)
         {
-            head = null;
-            tail = null;
-            count = 0;
-        }
-
-        public bool Contains(T data)
-        {
-            DoublyNode<T> current = head;
-            while (current != null)
+            int i;
+            StringBuilder sOutput = new StringBuilder(arrInput.Length);
+            for (i = 0; i < arrInput.Length - 1; i++)
             {
-                if (current.Data.Equals(data))
-                    return true;
-                current = current.Next;
+                sOutput.Append(arrInput[i].ToString("X2"));
             }
-            return false;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)this).GetEnumerator();
-        }
-
-        IEnumerator<T> IEnumerable<T>.GetEnumerator()
-        {
-            DoublyNode<T> current = head;
-            while (current != null)
-            {
-                yield return current.Data;
-                current = current.Next;
-            }
-        }
-        public void Deque<T> Main(string[] args)
-        {
-            
+            return sOutput.ToString();
         }
     }
 }
