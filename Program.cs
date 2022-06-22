@@ -1,58 +1,63 @@
 ﻿using System;
 
-namespace Lab3
+namespace Lab5
 {
     class Program
     {
-        static int IndexOfMin(int[] array, int n)
+        //метод обміну елементів
+        static void Swap(ref int e1, ref int e2)
         {
-            int result = n;
-            for (var i = n; i < array.Length; ++i)
+            var temp = e1;
+            e1 = e2;
+            e2 = temp;
+        }
+
+        //сортування змішуванням
+        static int[] ShakerSort(int[] array)
+        {
+            for (var i = 0; i < array.Length / 2; i++)
             {
-                if (array[i] < array[result])
+                var swapFlag = false;
+                for (var j = i; j < array.Length - i - 1; j++)
                 {
-                    result = i;
+                    if (array[j] > array[j + 1])
+                    {
+                        Swap(ref array[j], ref array[j + 1]);
+                        swapFlag = true;
+                    }
+                }
+
+                for (var j = array.Length - 2 - i; j > i; j--)
+                {
+                    if (array[j - 1] > array[j])
+                    {
+                        Swap(ref array[j - 1], ref array[j]);
+                        swapFlag = true;
+                    }
+                }
+
+                if (!swapFlag)
+                {
+                    break;
                 }
             }
 
-            return result;
-        }
-
-        static void Swap(ref int x, ref int y)
-        {
-            var t = x;
-            x = y;
-            y = t;
-        }
-
-        static int[] SelectionSort(int[] array, int currentIndex = 0)
-        {
-            if (currentIndex == array.Length)
-                return array;
-
-            var index = IndexOfMin(array, currentIndex);
-            if (index != currentIndex)
-            {
-                Swap(ref array[index], ref array[currentIndex]);
-            }
-
-            return SelectionSort(array, currentIndex + 1);
+            return array;
         }
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Сортування вибором");
-            Console.BackgroundColor = ConsoleColor.Red;
+            Console.WriteLine("Сортування змішуванням");
             Console.Write("Введіть елементи масиву: ");
-            var s = Console.ReadLine().Split(new[] { " ", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
-            Console.BackgroundColor = ConsoleColor.Green;
-            var a = new int[s.Length];
-            for (int i = 0; i < s.Length; i++)
+            var parts = Console.ReadLine().Split(new[] { " ", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+            var array = new int[parts.Length];
+            for (int i = 0; i < parts.Length; i++)
             {
-                a[i] = Convert.ToInt32(s[i]);
+                array[i] = Convert.ToInt32(parts[i]);
             }
 
-            Console.WriteLine("Впорядкований масив: {0}", string.Join(", ", SelectionSort(a)));
+            Console.WriteLine("Впорядкований масив: {0}", string.Join(", ", ShakerSort(array)));
+
             Console.ReadLine();
         }
     }
